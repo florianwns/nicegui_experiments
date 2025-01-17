@@ -1,0 +1,17 @@
+import { MyButton } from "./my_button.slint";
+
+export component AppWindow inherits Window {
+    preferred-width: 400px;
+    preferred-height: 400px;
+    area := TouchArea { }
+
+    if area.pressed: Rectangle {
+        background: blue;
+    }
+    if !area.pressed: Rectangle {
+        background: red;
+    }
+    MyButton {
+        text: "Hello";
+    }
+}

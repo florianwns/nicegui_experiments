@@ -1,0 +1,8 @@
+import { Button } from "std-widgets.slint";
+
+export component MyButton inherits Button {
+    text: "";
+    clicked() => {
+        self.text += "...";
+    }
+}
