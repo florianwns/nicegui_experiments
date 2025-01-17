@@ -28,4 +28,5 @@ def main(page: Page):
     )
 
 
-flet.app(target=main)
+# flet.app(target=main)
+flet.app(target=main, view=flet.AppView.WEB_BROWSER)
