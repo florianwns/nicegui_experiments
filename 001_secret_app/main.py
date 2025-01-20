@@ -7,7 +7,7 @@ from typing import Optional
 
 from fastapi import Request
 from fastapi.responses import RedirectResponse
-from nicegui import app, ui, native
+from nicegui import app, ui
 from starlette.middleware.base import BaseHTTPMiddleware
 
 # In the real life, users passwords would obviously need to be hashed
@@ -132,8 +132,5 @@ def main_page():
 
 if __name__ in {'__main__', '__mp_main__'}:
     ui.run(
-        reload=False,
-        native=True,
-        port=native.find_open_port(),
         storage_secret='THIS_NEEDS_TO_BE_CHANGED'
     )
