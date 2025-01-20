@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-"""This is just a simple authentication example.
-
-The secret page generate a secret for secret things.
+"""This is just a simple authentication example
+with a secret page that generates a secret for secret things.
 """
 import hashlib
 from typing import Optional
@@ -94,8 +93,8 @@ def main_page():
         with container:
             secret_input = ui.chat_message(
                 secret_value,
-                name='Secret Keeper',
-                avatar='https://robohash.org/secret_keeper',
+                name="Secret Keeper",
+                avatar=f"https://robohash.org/{app.storage.user.get('username', 'roger')}?set=set5",
                 sent=True,
             )
 
