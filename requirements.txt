@@ -5,3 +5,5 @@ numba
 nicegui
 opencv-python-headless
 pycairo
+pywebview
+pyinstaller
