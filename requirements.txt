@@ -1,3 +1,7 @@
 flet[all]==0.26.0.dev4003
 poetry
 numpy
+numba
+nicegui
+opencv-python-headless
+pycairo
