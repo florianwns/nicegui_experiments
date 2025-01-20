@@ -132,5 +132,8 @@ def main_page():
 
 if __name__ in {'__main__', '__mp_main__'}:
     ui.run(
+        # reload=False,
+        # native=True,
+        # port=native.find_open_port(),
         storage_secret='THIS_NEEDS_TO_BE_CHANGED'
     )
