@@ -2,12 +2,14 @@
 """An app who take a video then generate secondary images.
 """
 import base64
+import os
 import threading
 from datetime import datetime
 from typing import Union
 
 import aiofiles
 import cv2
+import numpy as np
 from nicegui import ui, events
 
 
@@ -18,8 +20,23 @@ def log(message: Union[str, Exception]):
     )
 
 
-def on_frame(index: int, frame: cv2.typing.MatLike) -> None:
-    print(index, frame.shape)
+class Average:
+    def __init__(self):
+        self._counter = 0
+        self._summ = 0
+
+    def add_frame(self, frame: np.ndarray) -> None:
+        if not self._counter:
+            self._summ = frame.astype(np.uint32)
+        else:
+            self._summ += frame
+        self._counter += 1
+
+    def compute(self) -> np.ndarray:
+        if not self._counter:
+            raise ValueError("No frames yet")
+
+        return (self._summ / self._counter).astype('uint8')
 
 
 def decode_video(filepath, notify, container):
@@ -28,29 +45,30 @@ def decode_video(filepath, notify, container):
         if not stream.isOpened():
             raise Exception("cv2: Video stream can't be opened")
 
-        frame_index = 0
-        avg_image = None
+        frame_index = 1
+        avg = Average()
         while True:
             frame_got, frame = stream.read()
-            if frame_got:
-                frame_index += 1
-                on_frame(frame_index, frame)
-                notify(f"{frame_index} | {frame.shape}")
-                if frame_index > 100:
-                    break
-                if avg_image is None:
-                    avg_image = frame.astype('float32')
-                else:
-                    avg_image + frame
+            if not frame_got:
+                break
 
-        _, buffer = cv2.imencode('.jpeg', avg_image.astype('uint8'))
+            avg.add_frame(frame)
+
+            frame_index += 1
+            notify(f"{frame_index} | {frame.shape}")
+
+        _, buffer = cv2.imencode('.jpeg', avg.compute())
         encoded_image = base64.b64encode(buffer).decode('utf-8')
 
         with container:
             ui.image(f"data:image/jpeg;base64,{encoded_image}")
 
-
+    except Exception as e:
+        notify(e)
     finally:
+        if os.path.exists(filepath):
+            notify(f"Remove temporary file : {filepath}")
+            os.remove(filepath)
         if stream and stream.isOpened():
             notify("cv2: Release video stream")
             stream.release()
@@ -73,7 +91,7 @@ async def handle_upload(args: events.UploadEventArguments) -> None:
         log(e)
 
 
-with ui.card().classes("absolute-center w-[860px] p-10") as container:
+with ui.column().classes("w-full p-10") as container:
     upload_input = ui.upload(
         label='Upload a video file',
         auto_upload=True,
@@ -83,6 +101,8 @@ with ui.card().classes("absolute-center w-[860px] p-10") as container:
 
 if __name__ in {'__main__', '__mp_main__'}:
     ui.run(
+        native=True,
         port=8093,
+        reload=False,
         storage_secret='THIS_NEEDS_TO_BE_CHANGED'
     )
