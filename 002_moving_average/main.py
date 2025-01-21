@@ -63,7 +63,6 @@ async def handle_upload(args: events.UploadEventArguments) -> None:
             await temp_file.write(contents)
 
             filepath = temp_file.name
-            ui.notify("Start to decode {filepath}")
             log(f"Start to decode {filepath}")
             threading.Thread(
                 target=decode_video,
