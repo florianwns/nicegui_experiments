@@ -2,8 +2,10 @@ flet[all]==0.26.0.dev4003
 poetry
 numpy
 numba
+matplotlib
 nicegui
 opencv-python-headless
 pycairo
 pywebview
 pyinstaller
+sympy
