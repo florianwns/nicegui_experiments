@@ -6,7 +6,7 @@ from math import sqrt
 
 import matplotlib.pyplot as plt
 import numpy as np
-from nicegui import ui
+from nicegui import ui, run
 from numba import jit
 from sympy import fibonacci
 
@@ -88,8 +88,8 @@ def create_plot(data):
 
     colors = ["#FFB3BA", "#FFDFBA", "#FFFFBA", "#BAFFC9", "#BAE1FF", "#D5BAFF"]
     ax.bar(names, times, color=colors)
-    ax.set_ylabel('Temps (secondes)')
-    ax.set_title(f'Temps d\'exécution pour Fibonacci(n)')
+    ax.set_ylabel('Time (seconds)')
+    ax.set_title(f'Execution time for Fibonacci(n)')
 
     # Save the fig
     buffer = BytesIO()
@@ -100,11 +100,16 @@ def create_plot(data):
     return encoded_image
 
 
-def on_run():
-    n = int(number_input.value)
-    results = benchmark_fibonacci(n)
+async def on_run():
+    # Display the spinner during the calculation
+    spinner.visible = True
 
-    # Display result in table
+    n = int(number_input.value)
+
+    # Use cpu_bound to run the benchmark without blocking the UI
+    results = await run.cpu_bound(benchmark_fibonacci, n)
+
+    # Cache the results and the plot
     table.rows.clear()
     for name, data in results.items():
         table.add_row(row={
@@ -113,19 +118,24 @@ def on_run():
             "time": f"{data['time']:.6f} s",
         })
 
-    # Display plot
+    # Generate and display the plot
     plot_image = create_plot(results)
     plot.set_content(f'<img src="data:image/png;base64,{plot_image}" style="width:100%;">')
 
+    # Hide the spinner after the calculation
+    spinner.visible = False
+
 
 with ui.column():
-    ui.label("Benchmark des différentes fonctions Fibonacci").classes("text-xl font-bold")
+    ui.label("Benchmark of different Fibonacci functions").classes("text-xl font-bold")
 
     with ui.row():
-        number_input = ui.number(label="Valeur de n", value=10, min=1, step=1)
-        ui.button("Lancer le benchmark", on_click=on_run)
+        number_input = ui.number(label="Value of n", value=10, min=1, step=1)
+        ui.button("Run the benchmark", on_click=on_run)
+        spinner = ui.spinner('audio', size='lg')
+        spinner.visible = False
 
-    # Create the table for display results
+    # Create the table for displaying results
     columns = [
         {'name': 'name', 'label': 'Name', 'field': 'name'},
         {'name': 'result', 'label': 'Result', 'field': 'result'},
@@ -136,4 +146,4 @@ with ui.column():
     # Plot
     plot = ui.html().classes("mt-4")
 
-ui.run(title="Benchmark Fibonacci")
+ui.run(title="Fibonacci Benchmark")
