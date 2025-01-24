@@ -91,6 +91,18 @@ def create_plot(data):
     ax.set_ylabel('Time (seconds)')
     ax.set_title(f'Execution time for Fibonacci(n)')
 
+    # Improve x-axis labels spacing
+    ax.set_xticklabels(names, rotation=45, ha='right')  # Rotate and align labels
+
+    # Adjust the x-ticks for more uniform spacing
+    ax.set_xticks(np.arange(len(names)))
+
+    # Set y-axis to logarithmic scale
+    ax.set_yscale('log')
+
+    # Add padding at the bottom for the x-axis labels
+    plt.subplots_adjust(bottom=0.3)  # Adjust the bottom padding
+
     # Save the fig
     buffer = BytesIO()
     plt.savefig(buffer, format="png")
@@ -126,7 +138,7 @@ async def on_run():
     spinner.visible = False
 
 
-with ui.column():
+with ui.column().classes("text-center w-[600px] m-auto"):
     ui.label("Benchmark of different Fibonacci functions").classes("text-xl font-bold")
 
     with ui.row():
