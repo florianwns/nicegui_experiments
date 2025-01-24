@@ -92,6 +92,7 @@ def create_plot(data):
     ax.set_title(f'Execution time for Fibonacci(n)')
 
     # Improve x-axis labels spacing
+    ax.set_xticks(range(len(names)))
     ax.set_xticklabels(names, rotation=45, ha='right')  # Rotate and align labels
 
     # Adjust the x-ticks for more uniform spacing
