@@ -62,8 +62,8 @@ def fib_lru(n):
 def benchmark_fibonacci(n):
     results = {}
     functions = {
-        "Numba": fib_numba,
-        "Numba cache": fib_numba_cache,
+        # "Numba": fib_numba,
+        # "Numba cache": fib_numba_cache,
         "Numba iter": fib_numba_iter,
         "Sympy": fib_sympy,
         "Binet": fib_binet,
