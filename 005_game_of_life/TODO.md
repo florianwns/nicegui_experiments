@@ -2,17 +2,19 @@
 
 - [x] Make speed button works
 
-- [ ] Add toggle play/button
+- [x] Add toggle play/button
 
-- [ ] Add empty canvas for the grid or svg
+- [x] Add empty canvas with window resize
 
-- [ ] implement core of the algorithm
+- [x] Generate a grid in SVG depends on container size
 
-- [ ] _
+- [ ] Paint the Grid
 
-- [ ] _
+- [ ] Erase the Grid
 
-- [ ] _
+- [ ] Make random Grid
+
+- [ ] Implement the gen method
 
 - [ ] _
 

@@ -29,7 +29,19 @@ def home():
     ui.add_head_html(
         '<link href="https://cdn.jsdelivr.net/themify-icons/0.1.2/css/themify-icons.css" rel="stylesheet" />'
     )
-    ui.add_css("body{ overflow:hidden !important; }")
+    ui.add_css("""
+    body{ 
+        overflow:hidden !important; 
+    }
+    svg {
+      border: 1px solid #ccc;
+      display: block;
+    }
+    rect:hover {
+        cursor: crosshair;
+        fill: #bd5;
+    }
+    """)
 
     # --------------------------------------- #
     # ============ Build UI ================= #
@@ -39,8 +51,8 @@ def home():
     ui.colors(primary="white")
 
     # Remove padding of the nicegui-content element
-    ui.query(".nicegui-content").classes("p-0 m-0 h-full w-full position-relative")
-    gol = GameOfLife().classes("position-absolute top-0 left-O bg-gray-100")
+    ui.query(".nicegui-content").classes("p-0")
+    gol = GameOfLife()
 
     # ============= Header  ================= #
     with ui.header().classes(

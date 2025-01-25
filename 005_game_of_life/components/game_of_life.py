@@ -8,6 +8,7 @@ class GameOfLife(ui.element, component="game_of_life.js"):
         self._props['speed']: float = 1.0
         self._props['playing']: bool = False
         self._props['generation_num']: int = 0
+        self._props['drawing']: str = "draw"
 
     @property
     def speed(self):
