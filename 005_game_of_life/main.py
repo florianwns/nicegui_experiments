@@ -166,7 +166,7 @@ def home():
             custom_icon("ti-plus", size="xs", on_click=gol.increase_speed)
 
     # ================ Tabs ================= #
-    with ui.tab_panels(tabs, value='Board'):
+    with ui.tab_panels(tabs, value='Board').classes("w-full"):
         with ui.tab_panel('Board'):
             gol.ui_init()
         with ui.tab_panel('Lexicon'):
