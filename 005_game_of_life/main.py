@@ -15,7 +15,7 @@ class GameOfLife(ui.element):
         self._playing: bool = False
         self._generation_num: int = 0
 
-    def ui_init(self):
+    def init_ui(self):
         super().__init__("div")
 
     @property
@@ -168,7 +168,7 @@ def home():
     # ================ Tabs ================= #
     with ui.tab_panels(tabs, value='Board').classes("w-full"):
         with ui.tab_panel('Board'):
-            gol.ui_init()
+            gol.init_ui()
         with ui.tab_panel('Lexicon'):
             ui.label('Lexicon')
         with ui.tab_panel('Help'):
