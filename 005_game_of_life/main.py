@@ -6,7 +6,7 @@ A remake of : https://halimb.github.io/gol/
 from typing import Optional
 
 from nicegui import ui
-from nicegui.events import Handler, ClickEventArguments, GenericEventArguments
+from nicegui.events import Handler, ClickEventArguments
 
 
 class GameOfLife(ui.element):
@@ -49,10 +49,6 @@ class GameOfLife(ui.element):
     def toggle_play(self, *args, **kwarg):
         self.playing = not self.playing
 
-    def on_container_resize(self, event: GenericEventArguments):
-        if "width" in event.args and "height" in event.args:
-            self.build(**event.args)
-
     @property
     def generation_num(self):
         return self._generation_num
@@ -62,7 +58,15 @@ class GameOfLife(ui.element):
         print("generation", self.generation_num)
         pass
 
-    def build(self, width: int = 100, height: int = 100) -> None:
+    def build(
+            self,
+            width: int = None,
+            height: int = None,
+            *args, **kwargs
+    ) -> None:
+        if not width and not height:
+            return
+
         # Clear all children
         self.clear()
         with self:
@@ -107,7 +111,7 @@ def home():
     ''')
 
     # Add event listeners
-    ui.on('container_resize', gol.on_container_resize)
+    ui.on('container_resize', lambda event: gol.build(**event.args))
 
     # Build main theme
     ui.colors(primary="white")
