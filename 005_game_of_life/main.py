@@ -8,69 +8,7 @@ from typing import Optional
 from nicegui import ui
 from nicegui.events import Handler, ClickEventArguments
 
-
-class GameOfLife(ui.element):
-    def __init__(self):
-        self._speed: float = 1.
-        self._playing: bool = False
-        self._generation_num: int = 0
-
-    def init_ui(self):
-        super().__init__("div")
-
-    @property
-    def speed(self):
-        return self._speed
-
-    @speed.setter
-    def speed(self, value):
-        self._speed = min(4., max(0.25, float(value)))
-
-    def decrease_speed(self, *args, **kwarg):
-        self.speed /= 2
-
-    def increase_speed(self, *args, **kwarg):
-        self.speed *= 2
-
-    @property
-    def playing(self):
-        return self._playing
-
-    @playing.setter
-    def playing(self, value: bool):
-        self._playing = value
-
-    def play(self):
-        self.playing = True
-
-    def pause(self):
-        self.playing = False
-
-    def toggle_play(self, *args, **kwarg):
-        self.playing = not self.playing
-
-    @property
-    def generation_num(self):
-        return self._generation_num
-
-    def generate(self, *args, **kwarg):
-        self._generation_num += 1
-        print("generation", self.generation_num)
-        pass
-
-    def build(
-            self,
-            width: int = None,
-            height: int = None,
-            *args, **kwargs
-    ) -> None:
-        if not width and not height:
-            return
-
-        # Clear all children
-        self.clear()
-        with self:
-            ui.label(f"Build {width}x{height}")
+from components.game_of_life import GameOfLife
 
 
 def custom_icon(
@@ -87,74 +25,52 @@ def custom_icon(
 
 @ui.page('/')
 def home():
-    # Init Game engine
-    gol = GameOfLife()
-
-    # Add icons CSS
+    # Add CSS styles
     ui.add_head_html(
         '<link href="https://cdn.jsdelivr.net/themify-icons/0.1.2/css/themify-icons.css" rel="stylesheet" />'
     )
-
-    # Remove padding of the nicegui-content element
-    ui.query(".nicegui-content").classes("p-0")
-    ui.add_head_html('''
-        <script>
-        function emitContainerSizeEvent() {
-            container = document.getElementById("c2")
-            emitEvent('container_resize', {
-                width: container.offsetWidth,
-                height: container.offsetHeight,
-            });
-        }
-        window.onresize = emitContainerSizeEvent;
-        </script>
-    ''')
-
-    # Add event listeners
-    ui.on('container_resize', lambda event: gol.build(**event.args))
-
-    # Build main theme
-    ui.colors(primary="white")
+    ui.add_css("body{ overflow:hidden !important; }")
 
     # --------------------------------------- #
     # ============ Build UI ================= #
     # --------------------------------------- #
 
+    # Build main theme
+    ui.colors(primary="white")
+
+    # Remove padding of the nicegui-content element
+    ui.query(".nicegui-content").classes("p-0 m-0 h-full w-full position-relative")
+    gol = GameOfLife().classes("position-absolute top-0 left-O bg-gray-100")
+
     # ============= Header  ================= #
     with ui.header().classes(
-            replace='text-black bg-white flex items-center px-2 shadow-2'
+            replace='text-black bg-white flex items-center p-2 shadow-2'
     ):
+        ui.space()
         ui.label("Conway’s Game of Life").classes('font-bold text-2xl')
         ui.space()
-        with ui.tabs().props("inline-label") as tabs:
-            ui.tab('Board', icon="apps")
-            ui.tab('Lexicon', icon="menu_book")
-            ui.tab('Help', icon="info")
+        with ui.row().classes("items-center"):
+            custom_icon("ti-control-shuffle")
+            custom_icon("ti-star")
 
     # ======== Footer / Controls ============ #
     with ui.footer().classes(
             "bg-white text-black flex items-center px-4 shadow-2"
     ):
         with ui.row().classes("items-center"):
-            custom_icon("ti-star")
-            ui.label('Generation : 0').bind_text_from(
-                gol,
-                target_name="generation_num",
-                backward=lambda value: f"Generation : {value}"
-            )
-        ui.space()
-        with ui.row().classes("items-center"):
-            custom_icon("ti-control-shuffle")
-            custom_icon("ti-trash").classes("q-mr-xl")
             custom_icon("ti-control-play", on_click=gol.toggle_play).bind_icon_from(
                 gol,
                 target_name="playing",
                 backward=lambda value: "ti-control-play" if value else "ti-control-pause"
             )
-            custom_icon("ti-control-skip-forward", on_click=lambda value: (gol.pause(), gol.generate())) \
-                .classes("q-mr-xl")
-            custom_icon("ti-pencil")
-            custom_icon("ti-eraser")
+            custom_icon("ti-control-skip-forward", on_click=lambda value: (gol.pause(), gol.generate()))
+
+            ui.label('Generation : 0').bind_text_from(
+                gol,
+                target_name="generation_num",
+                backward=lambda value: f"Generation : {value}"
+            )
+
         ui.space()
         with ui.row().classes("items-center"):
             custom_icon("ti-minus", size="xs", on_click=gol.decrease_speed)
@@ -165,17 +81,14 @@ def home():
             )
             custom_icon("ti-plus", size="xs", on_click=gol.increase_speed)
 
-    # ================ Tabs ================= #
-    with ui.tab_panels(tabs, value='Board').classes("w-full"):
-        with ui.tab_panel('Board'):
-            gol.init_ui()
-        with ui.tab_panel('Lexicon'):
-            ui.label('Lexicon')
-        with ui.tab_panel('Help'):
-            ui.label('Help')
+        ui.space()
+        with ui.row().classes("items-center"):
+            custom_icon("ti-pencil")
+            custom_icon("ti-eraser")
+            custom_icon("ti-trash")
 
-    # Emit container size event
-    ui.run_javascript("emitContainerSizeEvent()")
+    # Call Game Of Life to init canvas size
+    gol.run_method("update")
 
 
 if __name__ in {'__main__', '__mp_main__'}:
