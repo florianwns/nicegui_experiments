@@ -6,17 +6,17 @@ A remake of : https://halimb.github.io/gol/
 from typing import Optional
 
 from nicegui import ui
-from nicegui.events import Handler, ClickEventArguments
+from nicegui.events import Handler, ClickEventArguments, GenericEventArguments
 
 
-class GameOfLife:
+class GameOfLife(ui.element):
     def __init__(self):
         self._speed: float = 1.
         self._playing: bool = False
         self._generation_num: int = 0
 
-    def build(self):
-        ui.label('This page is defined in a class.')
+    def ui_init(self):
+        super().__init__("div")
 
     @property
     def speed(self):
@@ -49,6 +49,10 @@ class GameOfLife:
     def toggle_play(self, *args, **kwarg):
         self.playing = not self.playing
 
+    def on_container_resize(self, event: GenericEventArguments):
+        if "width" in event.args and "height" in event.args:
+            self.build(**event.args)
+
     @property
     def generation_num(self):
         return self._generation_num
@@ -57,6 +61,12 @@ class GameOfLife:
         self._generation_num += 1
         print("generation", self.generation_num)
         pass
+
+    def build(self, width: int = 100, height: int = 100) -> None:
+        # Clear all children
+        self.clear()
+        with self:
+            ui.label(f"Build {width}x{height}")
 
 
 def custom_icon(
@@ -73,15 +83,43 @@ def custom_icon(
 
 @ui.page('/')
 def home():
+    # Init Game engine
     gol = GameOfLife()
 
+    # Add icons CSS
     ui.add_head_html(
         '<link href="https://cdn.jsdelivr.net/themify-icons/0.1.2/css/themify-icons.css" rel="stylesheet" />'
     )
+
+    # Remove padding of the nicegui-content element
+    ui.query(".nicegui-content").classes("p-0")
+    ui.add_head_html('''
+        <script>
+        function emitContainerSizeEvent() {
+            container = document.getElementById("c2")
+            emitEvent('container_resize', {
+                width: container.offsetWidth,
+                height: container.offsetHeight,
+            });
+        }
+        window.onresize = emitContainerSizeEvent;
+        </script>
+    ''')
+
+    # Add event listeners
+    ui.on('container_resize', gol.on_container_resize)
+
+    # Build main theme
     ui.colors(primary="white")
+
+    # --------------------------------------- #
+    # ============ Build UI ================= #
+    # --------------------------------------- #
+
+    # ============= Header  ================= #
     with ui.header().classes(
             replace='text-black bg-white flex items-center px-2 shadow-2'
-    ) as header:
+    ):
         ui.label("Conway’s Game of Life").classes('font-bold text-2xl')
         ui.space()
         with ui.tabs().props("inline-label") as tabs:
@@ -89,9 +127,10 @@ def home():
             ui.tab('Lexicon', icon="menu_book")
             ui.tab('Help', icon="info")
 
+    # ======== Footer / Controls ============ #
     with ui.footer().classes(
             "bg-white text-black flex items-center px-4 shadow-2"
-    ) as footer:
+    ):
         with ui.row().classes("items-center"):
             custom_icon("ti-star")
             ui.label('Generation : 0').bind_text_from(
@@ -122,13 +161,17 @@ def home():
             )
             custom_icon("ti-plus", size="xs", on_click=gol.increase_speed)
 
-    with (ui.tab_panels(tabs, value='Board').classes('w-full')):
+    # ================ Tabs ================= #
+    with ui.tab_panels(tabs, value='Board'):
         with ui.tab_panel('Board'):
-            gol.build()
+            gol.ui_init()
         with ui.tab_panel('Lexicon'):
             ui.label('Lexicon')
         with ui.tab_panel('Help'):
             ui.label('Help')
+
+    # Emit container size event
+    ui.run_javascript("emitContainerSizeEvent()")
 
 
 if __name__ in {'__main__', '__mp_main__'}:
