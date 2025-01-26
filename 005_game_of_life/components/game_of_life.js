@@ -18,6 +18,7 @@ export default {
         this.size = 16;
         this.cols = 0;
         this.rows = 0;
+        this.padding = [0, 0];
 
         this.sketch = new p5((sketch) => {
             sketch.setup = function () {
@@ -33,7 +34,7 @@ export default {
         window.onload = this.resize;
     },
     methods: {
-        get_size() {
+        get_available_size() {
             const headers = document.getElementsByClassName("q-header")
             const header_height = headers.length === 1 ? headers[0].offsetHeight : 0;
 
@@ -62,7 +63,11 @@ export default {
                     } else {
                         this.sketch.fill(0, 255, 255);
                     }
-                    this.sketch.square(i * this.size, j * this.size, this.size);
+                    this.sketch.square(
+                        i * this.size + this.padding[0],
+                        j * this.size + this.padding[1],
+                        this.size
+                    );
                 }
             }
         },
@@ -112,12 +117,19 @@ export default {
             this.generation_num += 1;
             emitEvent("gol__generation_num", this.generation_num);
         },
-        reset(random = false, width = null, height = null) {
+        reset(random = false) {
+            const available_size = this.get_available_size()
+            this.sketch.resizeCanvas(available_size.width, available_size.height);
+
             this.generation_num = 0;
             emitEvent("gol__generation_num", this.generation_num);
 
-            this.cols = Math.floor((width | this.sketch.width) / this.size);
-            this.rows = Math.floor((height | this.sketch.height) / this.size);
+            this.cols = Math.floor(available_size.width / this.size);
+            this.rows = Math.floor(available_size.height / this.size);
+            this.padding = [
+                (available_size.width - this.cols * this.size) / 2,
+                (available_size.height - this.rows * this.size) / 2,
+            ]
             this.grid = [];
 
             // Init array
@@ -129,9 +141,7 @@ export default {
             }
         },
         resize() {
-            const size = this.get_size()
-            this.sketch.resizeCanvas(size.width, size.height);
-            this.reset(true, size.width, size.height);
+            this.reset(true);
         },
     },
 };
