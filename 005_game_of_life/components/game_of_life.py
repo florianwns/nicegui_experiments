@@ -14,6 +14,7 @@ class GameOfLife(
         self._props['speed']: float = 1.0
         self._props['playing']: bool = False
         self._props['drawing']: str = "pencil"
+        self._props['hex_color']: str = "#5893a8"
 
         # Add event listener
         self.generation_num = 0
@@ -68,3 +69,15 @@ class GameOfLife(
 
     def use_eraser(self, *args, **kwarg):
         self.drawing = "eraser"
+
+    @property
+    def hex_color(self):
+        return self._props['hex_color']
+
+    @hex_color.setter
+    def hex_color(self, value):
+        self._props['hex_color'] = value
+        self.update()
+
+    def set_hex_color(self, hex_color: str = None):
+        self.hex_color = hex_color or "#5893a8"  # the default color

@@ -8,6 +8,7 @@ export default {
         speed: Number,
         playing: Boolean,
         drawing: String,
+        hex_color: String,
     },
     async mounted() {
         await this.$nextTick(); // NOTE: wait for window.path_prefix to be set
@@ -31,7 +32,7 @@ export default {
 
         // Add event listeners
         window.onresize = this.resize;
-        window.onload = this.resize;
+        window.onload = this.init_grid_with_default_pattern;
     },
     methods: {
         get_available_size() {
@@ -56,12 +57,14 @@ export default {
                 this.generate_next_grid();
             }
 
+            const alive_color = this.sketch.color(this.hex_color)
+
             for (let i = 0; i < this.cols; i++) {
                 for (let j = 0; j < this.rows; j++) {
                     if (this.grid[i][j] === 0) {
                         this.sketch.fill(255);
                     } else {
-                        this.sketch.fill(0, 255, 255);
+                        this.sketch.fill(alive_color);
                     }
                     this.sketch.square(
                         i * this.size + this.padding[0],
@@ -139,6 +142,20 @@ export default {
                     this.grid[i][j] = (random) ? Math.floor(this.sketch.random(2)) : 0;
                 }
             }
+        },
+        init_grid_with_default_pattern() {
+            this.reset(false);
+
+            if (this.cols < 2 || this.rows < 2) {
+                return;
+            }
+            
+            // Default pattern
+            this.grid[1][0] = 1;
+            this.grid[2][1] = 1;
+            this.grid[0][2] = 1;
+            this.grid[1][2] = 1;
+            this.grid[2][2] = 1;
         },
         resize() {
             this.reset(true);

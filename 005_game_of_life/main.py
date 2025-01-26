@@ -15,13 +15,13 @@ from components.game_of_life import GameOfLife
 
 
 def custom_icon(
-        name: str,
+        icon: Optional[str] = None,
         on_click: Optional[Handler[ClickEventArguments]] = None,
         color="gray-500",
         size="sm",
         *args, **kwargs
 ):
-    return ui.button(icon=f"{name}", on_click=on_click, color=color, *args, **kwargs) \
+    return ui.button(icon=icon, on_click=on_click, color=color, *args, **kwargs) \
         .props(f'padding="{size}" size="{size}"') \
         .classes("text-white")
 
@@ -90,7 +90,14 @@ def home():
 
         ui.space()
         with ui.row().classes("items-center"):
+            with custom_icon("ti-paint-bucket").style(f"background-color: {gol.hex_color}") as paint_icon:
+                ui.color_picker(on_pick=lambda e: (
+                    gol.set_hex_color(e.color),
+                    paint_icon.style(f"background-color: {e.color}"),
+                ))
+                
             custom_icon("ti-pencil", on_click=gol.use_pencil)
+
             custom_icon("ti-eraser", on_click=gol.use_eraser)
             custom_icon("ti-trash", on_click=lambda e: gol.reset(random=False))
 
