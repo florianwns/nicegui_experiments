@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """The Game of Life implemented with nicegui
 
-A remake of : https://halimb.github.io/gol/
+Sources :
+* https://halimb.github.io/gol/
+* https://editor.p5js.org/pattvira/sketches/cGuJD9_Ak
+* https://github.com/edwinm/game-of-life
 """
 from typing import Optional
 
