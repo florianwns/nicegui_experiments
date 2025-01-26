@@ -34,9 +34,15 @@ export default {
     },
     methods: {
         get_size() {
+            const headers = document.getElementsByClassName("q-header")
+            const header_height = headers.length === 1 ? headers[0].offsetHeight : 0;
+
+            const footers = document.getElementsByClassName("q-footer")
+            const footer_height = footers.length === 1 ? footers[0].offsetHeight : 0;
+
             return {
                 width: this.sketch.windowWidth,
-                height: this.sketch.windowHeight,
+                height: this.sketch.windowHeight - header_height - footer_height,
             };
         },
         draw() {
