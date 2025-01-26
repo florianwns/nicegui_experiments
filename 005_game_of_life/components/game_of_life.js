@@ -86,14 +86,16 @@ export default {
             for (let i = 0; i < this.cols; i++) {
                 next_grid[i] = [];
                 for (let j = 0; j < this.rows; j++) {
-                    let neighbors = this.count_neighbors(i, j);
-                    if (this.grid[i][j] === 1 && neighbors < 2) {
+                    const neighbors = this.count_neighbors(i, j);
+                    const is_alive = this.grid[i][j] === 1;
+
+                    if (is_alive && neighbors < 2) {
                         next_grid[i][j] = 0;
-                    } else if (this.grid[i][j] === 1 && (neighbors === 2 || neighbors === 3)) {
+                    } else if (is_alive && (neighbors === 2 || neighbors === 3)) {
                         next_grid[i][j] = 1;
-                    } else if (this.grid[i][j] === 1 && neighbors > 3) {
+                    } else if (is_alive && neighbors > 3) {
                         next_grid[i][j] = 0;
-                    } else if (this.grid[i][j] === 0 && neighbors === 3) {
+                    } else if (!is_alive && neighbors === 3) {
                         next_grid[i][j] = 1;
                     } else {
                         next_grid[i][j] = this.grid[i][j];
