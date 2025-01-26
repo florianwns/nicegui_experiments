@@ -1,2 +1,3 @@
-# Experimentations with 👨 NiceGui Framework
+# 👨 NiceGui Experiments
+
 
