@@ -173,3 +173,6 @@ cython_debug/
 nicegui_examples/
 
 .nicegui
+
+node_modules
+package-lock.json
