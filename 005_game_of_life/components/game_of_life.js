@@ -23,8 +23,9 @@ export default {
             sketch.setup = function () {
                 sketch.createCanvas(sketch.windowWidth, sketch.windowHeight);
             };
-            // 60 FPS
             sketch.draw = this.draw;
+            sketch.mouseDragged = this.update_drawing;
+            sketch.mouseClicked = this.update_drawing;
         }, this.$el);
 
         // Add event listeners
@@ -36,16 +37,16 @@ export default {
             return {
                 width: this.sketch.windowWidth,
                 height: this.sketch.windowHeight,
-
             };
         },
         draw() {
-            let x = this.sketch.frameCount % (40 / this.speed) * 10
+            // let x = this.sketch.frameCount % (40 / this.speed) * 10
 
             // FPS is 60, but we increase generation only if
-            const must_be_generated = this.playing;
-            if (must_be_generated) {
-                this.generate();
+            const must_generate_next_grid = this.playing
+                && this.sketch.frameCount % Math.floor(10 / this.speed) === 0;
+            if (must_generate_next_grid) {
+                this.generate_next_grid();
             }
 
             for (let i = 0; i < this.cols; i++) {
@@ -59,24 +60,67 @@ export default {
                 }
             }
         },
-        generate() {
+        update_drawing() {
+            const col = Math.floor(this.sketch.mouseX / this.size);
+            const row = Math.floor(this.sketch.mouseY / this.size);
+
+            // Check value exists then update
+            if ((this.grid[col] || [])[row] !== undefined) {
+                this.grid[col][row] = (this.drawing === "pencil") ? 1 : 0;
+            }
+        },
+        count_neighbors(x, y) {
+            let sum = 0;
+            for (let i = -1; i < 2; i++) {
+                for (let j = -1; j < 2; j++) {
+                    let nx = (x + i + this.cols) % this.cols;
+                    let ny = (y + j + this.rows) % this.rows;
+                    sum += this.grid[nx][ny];
+                }
+            }
+            sum -= this.grid[x][y];
+            return sum;
+        },
+        generate_next_grid() {
+            let next_grid = [];
+            for (let i = 0; i < this.cols; i++) {
+                next_grid[i] = [];
+                for (let j = 0; j < this.rows; j++) {
+                    let neighbors = this.count_neighbors(i, j);
+                    if (this.grid[i][j] === 1 && neighbors < 2) {
+                        next_grid[i][j] = 0;
+                    } else if (this.grid[i][j] === 1 && (neighbors === 2 || neighbors === 3)) {
+                        next_grid[i][j] = 1;
+                    } else if (this.grid[i][j] === 1 && neighbors > 3) {
+                        next_grid[i][j] = 0;
+                    } else if (this.grid[i][j] === 0 && neighbors === 3) {
+                        next_grid[i][j] = 1;
+                    } else {
+                        next_grid[i][j] = this.grid[i][j];
+                    }
+                }
+            }
+            this.grid = next_grid;
             this.generation_num += 1;
             emitEvent("gol__generation_num", this.generation_num);
         },
-        resize() {
-            const size = this.get_size()
-            this.cols = size.width / this.size;
-            this.rows = size.height / this.size;
+        reset(random = false, width = null, height = null) {
+            this.cols = Math.floor((width | this.sketch.width) / this.size);
+            this.rows = Math.floor((height | this.sketch.height) / this.size);
             this.grid = [];
 
             // Init array
             for (let i = 0; i < this.cols; i++) {
                 this.grid[i] = [];
                 for (let j = 0; j < this.rows; j++) {
-                    this.grid[i][j] = Math.floor(this.sketch.random(2));
+                    this.grid[i][j] = (random) ? Math.floor(this.sketch.random(2)) : 0;
                 }
             }
+        },
+        resize() {
+            const size = this.get_size()
             this.sketch.resizeCanvas(size.width, size.height);
+            this.reset(true, size.width, size.height);
         },
     },
 };

@@ -54,7 +54,7 @@ def home():
         ui.label("Conway’s Game of Life").classes('font-bold text-2xl')
         ui.space()
         with ui.row().classes("items-center"):
-            custom_icon("ti-control-shuffle")
+            custom_icon("ti-control-shuffle", on_click=lambda e: gol.reset(random=True))
             custom_icon("ti-star")
 
     # ======== Footer / Controls ============ #
@@ -67,7 +67,7 @@ def home():
                 target_name="playing",
                 backward=lambda value: "ti-control-pause" if value else "ti-control-play"
             )
-            custom_icon("ti-control-skip-forward", on_click=lambda value: (gol.pause(), gol.generate()))
+            custom_icon("ti-control-skip-forward", on_click=gol.generate_next_grid)
 
             ui.label('Generation : 0').bind_text_from(
                 gol,
@@ -87,9 +87,9 @@ def home():
 
         ui.space()
         with ui.row().classes("items-center"):
-            custom_icon("ti-pencil")
-            custom_icon("ti-eraser")
-            custom_icon("ti-trash")
+            custom_icon("ti-pencil", on_click=gol.use_pencil)
+            custom_icon("ti-eraser", on_click=gol.use_eraser)
+            custom_icon("ti-trash", on_click=lambda e: gol.reset(random=False))
 
 
 if __name__ in {'__main__', '__mp_main__'}:

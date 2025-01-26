@@ -13,11 +13,16 @@ class GameOfLife(
         self.add_resource(Path(__file__).parent.parent / 'libs')
         self._props['speed']: float = 1.0
         self._props['playing']: bool = False
-        self._props['drawing']: str = "draw"
+        self._props['drawing']: str = "pencil"
 
         # Add event listener
         self.generation_num = 0
         ui.on('gol__generation_num', lambda e: setattr(self, "generation_num", e.args))
+
+    def reset(self, random: bool = False, *args, **kwarg):
+        self.generation_num = 0
+        self.drawing = "pencil"
+        self.run_method("reset", random)
 
     @property
     def speed(self):
@@ -45,3 +50,22 @@ class GameOfLife(
 
     def toggle_play(self, *args, **kwarg):
         self.playing = not self.playing
+
+    def generate_next_grid(self, *args, **kwarg):
+        self.playing = False
+        self.run_method("generate_next_grid")
+
+    @property
+    def drawing(self):
+        return self._props['drawing']
+
+    @drawing.setter
+    def drawing(self, value: bool):
+        self._props['drawing'] = value
+        self.update()
+
+    def use_pencil(self, *args, **kwarg):
+        self.drawing = "pencil"
+
+    def use_eraser(self, *args, **kwarg):
+        self.drawing = "eraser"

@@ -6,21 +6,21 @@
 
 - [x] Add empty canvas with window resize
 
-- [x] Generate a grid in SVG depends on container size
+- [x] Generate a grid with P5 depends on container size
 
-- [ ] Paint the Grid
+- [x] Paint the Grid
 
-- [ ] Erase the Grid
+- [x] Erase the Grid
 
-- [ ] Make random Grid
+- [x] Make random Grid
 
-- [ ] Implement the gen method
+- [x] Implement the gen method
 
-- [ ] _
+- [ ] Check the algorithm
 
-- [ ] _
+- [ ] Implement URL Sharing
 
-- [ ] _
+- [ ] Implement Lexicon
 
 - [ ] _
 
