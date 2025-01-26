@@ -1,51 +1,82 @@
+import {loadResource} from "../../static/utils/resources.js";
+
+
 export default {
-    template: "<svg></svg>",
+    template: "<div></div>",
     props: {
+        resource_path: String,
         speed: Number,
         playing: Boolean,
-        generation_num: Number,
         drawing: String,
     },
-    mounted() {
-        const svg = this.$el;
-        this.container = document.getElementById("c2")
+    async mounted() {
+        await this.$nextTick(); // NOTE: wait for window.path_prefix to be set
+        await loadResource(window.path_prefix + `${this.resource_path}/p5/p5.min.js`);
+
+        this.generation_num = 0;
+        this.grid = [];
+        this.size = 16;
+        this.cols = 0;
+        this.rows = 0;
+
+        this.sketch = new p5((sketch) => {
+            sketch.setup = function () {
+                sketch.createCanvas(sketch.windowWidth, sketch.windowHeight);
+            };
+            // 60 FPS
+            sketch.draw = this.draw;
+        }, this.$el);
 
         // Add event listeners
-        window.onresize = this.update;
+        window.onresize = this.resize;
+        window.onload = this.resize;
     },
     methods: {
-        update() {
-            const gridWidth = this.container.offsetWidth;
-            const gridHeight = this.container.offsetHeight;
+        get_size() {
+            return {
+                width: this.sketch.windowWidth,
+                height: this.sketch.windowHeight,
 
-            // Clear content
-            const svg = this.$el;
-            svg.innerHTML = "";
+            };
+        },
+        draw() {
+            let x = this.sketch.frameCount % (40 / this.speed) * 10
 
-            // Configurations
-            const squareSize = 16; // Size of each square in pixels
-            const numColumns = Math.floor(gridWidth / squareSize) + 1;
-            const numRows = Math.floor(gridHeight / squareSize) + 1;
+            // FPS is 60, but we increase generation only if
+            const must_be_generated = this.playing;
+            if (must_be_generated) {
+                this.generate();
+            }
 
-            // Set SVG dimensions
-            svg.setAttribute('width', gridWidth);
-            svg.setAttribute('height', gridHeight);
-
-            // Generate grid of squares
-            for (let y = 0; y < numRows; y++) {
-                for (let x = 0; x < numColumns; x++) {
-                    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                    rect.setAttribute('x', `${x * squareSize}`);
-                    rect.setAttribute('y', `${y * squareSize}`);
-                    rect.setAttribute('width', `${squareSize}`);
-                    rect.setAttribute('height', `${squareSize}`);
-                    rect.setAttribute('fill', '#ffffff');
-                    rect.setAttribute('stroke', '#bbb');
-                    rect.setAttribute('stroke-width', '1');
-                    svg.appendChild(rect);
+            for (let i = 0; i < this.cols; i++) {
+                for (let j = 0; j < this.rows; j++) {
+                    if (this.grid[i][j] === 0) {
+                        this.sketch.fill(255);
+                    } else {
+                        this.sketch.fill(0, 255, 255);
+                    }
+                    this.sketch.square(i * this.size, j * this.size, this.size);
                 }
             }
-            console.log(numColumns * numRows)
+        },
+        generate() {
+            this.generation_num += 1;
+            emitEvent("gol__generation_num", this.generation_num);
+        },
+        resize() {
+            const size = this.get_size()
+            this.cols = size.width / this.size;
+            this.rows = size.height / this.size;
+            this.grid = [];
+
+            // Init array
+            for (let i = 0; i < this.cols; i++) {
+                this.grid[i] = [];
+                for (let j = 0; j < this.rows; j++) {
+                    this.grid[i][j] = Math.floor(this.sketch.random(2));
+                }
+            }
+            this.sketch.resizeCanvas(size.width, size.height);
         },
     },
 };

@@ -1,14 +1,23 @@
+from pathlib import Path
+
 from nicegui import ui
 
 
-class GameOfLife(ui.element, component="game_of_life.js"):
+class GameOfLife(
+    ui.element,
+    component="game_of_life.js",
+):
     def __init__(self):
         # A 'Game Of Life' canvas
         super().__init__()
+        self.add_resource(Path(__file__).parent.parent / 'libs')
         self._props['speed']: float = 1.0
         self._props['playing']: bool = False
-        self._props['generation_num']: int = 0
         self._props['drawing']: str = "draw"
+
+        # Add event listener
+        self.generation_num = 0
+        ui.on('gol__generation_num', lambda e: setattr(self, "generation_num", e.args))
 
     @property
     def speed(self):
@@ -17,6 +26,7 @@ class GameOfLife(ui.element, component="game_of_life.js"):
     @speed.setter
     def speed(self, value):
         self._props['speed'] = min(4., max(0.25, float(value)))
+        self.update()
 
     def decrease_speed(self, *args, **kwarg):
         self.speed /= 2
@@ -31,19 +41,7 @@ class GameOfLife(ui.element, component="game_of_life.js"):
     @playing.setter
     def playing(self, value: bool):
         self._props['playing'] = value
-
-    def play(self):
-        self.playing = True
-
-    def pause(self):
-        self.playing = False
+        self.update()
 
     def toggle_play(self, *args, **kwarg):
         self.playing = not self.playing
-
-    @property
-    def generation_num(self):
-        return self._props['generation_num']
-
-    def generate(self, *args, **kwarg):
-        self._props['generation_num'] += 1

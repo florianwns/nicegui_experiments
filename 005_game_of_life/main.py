@@ -33,14 +33,6 @@ def home():
     body{ 
         overflow:hidden !important; 
     }
-    svg {
-      border: 1px solid #ccc;
-      display: block;
-    }
-    rect:hover {
-        cursor: crosshair;
-        fill: #bd5;
-    }
     """)
 
     # --------------------------------------- #
@@ -73,7 +65,7 @@ def home():
             custom_icon("ti-control-play", on_click=gol.toggle_play).bind_icon_from(
                 gol,
                 target_name="playing",
-                backward=lambda value: "ti-control-play" if value else "ti-control-pause"
+                backward=lambda value: "ti-control-pause" if value else "ti-control-play"
             )
             custom_icon("ti-control-skip-forward", on_click=lambda value: (gol.pause(), gol.generate()))
 
@@ -99,9 +91,6 @@ def home():
             custom_icon("ti-eraser")
             custom_icon("ti-trash")
 
-    # Call Game Of Life to init canvas size
-    gol.run_method("update")
-
 
 if __name__ in {'__main__', '__mp_main__'}:
-    ui.run(port=49374)
+    ui.run(port=49373)
