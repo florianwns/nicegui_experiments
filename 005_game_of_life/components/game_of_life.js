@@ -105,6 +105,9 @@ export default {
             emitEvent("gol__generation_num", this.generation_num);
         },
         reset(random = false, width = null, height = null) {
+            this.generation_num = 0;
+            emitEvent("gol__generation_num", this.generation_num);
+
             this.cols = Math.floor((width | this.sketch.width) / this.size);
             this.rows = Math.floor((height | this.sketch.height) / this.size);
             this.grid = [];

@@ -16,6 +16,8 @@
 
 - [x] Implement the gen method
 
+- [ ] do not reset grid on resize, but
+
 - [ ] Check the algorithm
 
 - [ ] Implement URL Sharing

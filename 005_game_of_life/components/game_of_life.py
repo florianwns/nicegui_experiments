@@ -20,7 +20,6 @@ class GameOfLife(
         ui.on('gol__generation_num', lambda e: setattr(self, "generation_num", e.args))
 
     def reset(self, random: bool = False, *args, **kwarg):
-        self.generation_num = 0
         self.drawing = "pencil"
         self.run_method("reset", random)
 
