@@ -16,14 +16,12 @@
 
 - [x] Implement the gen method
 
-- [ ] do not reset grid on resize, but
+- [x] Mode resize grid (fill with the old grid), random, empty
+
+- [ ] Do not reset grid on resize, but
 
 - [ ] Check the algorithm
 
-- [ ] Implement URL Sharing
+- [ ] Implement Favorites with user.storage
 
-- [ ] Implement Lexicon
-
-- [ ] _
-
-- [ ] _
+- [ ] Implement Lexicon : https://conwaylife.com/ref/lexicon/lex_1.htm

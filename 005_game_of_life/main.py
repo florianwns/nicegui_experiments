@@ -57,7 +57,7 @@ def home():
         ui.label("Conway’s Game of Life").classes('font-bold text-2xl')
         ui.space()
         with ui.row().classes("items-center"):
-            custom_icon("ti-control-shuffle", on_click=lambda e: gol.reset(random=True))
+            custom_icon("ti-control-shuffle", on_click=lambda e: gol.init_grid(mode="random"))
             custom_icon("ti-star")
 
     # ======== Footer / Controls ============ #
@@ -95,11 +95,11 @@ def home():
                     gol.set_hex_color(e.color),
                     paint_icon.style(f"background-color: {e.color}"),
                 ))
-                
+
             custom_icon("ti-pencil", on_click=gol.use_pencil)
 
             custom_icon("ti-eraser", on_click=gol.use_eraser)
-            custom_icon("ti-trash", on_click=lambda e: gol.reset(random=False))
+            custom_icon("ti-trash", on_click=lambda e: gol.init_grid())
 
 
 if __name__ in {'__main__', '__mp_main__'}:

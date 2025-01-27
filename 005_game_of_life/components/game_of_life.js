@@ -120,7 +120,7 @@ export default {
             this.generation_num += 1;
             emitEvent("gol__generation_num", this.generation_num);
         },
-        reset(random = false) {
+        init_grid(mode = "0") {
             const available_size = this.get_available_size()
             this.sketch.resizeCanvas(available_size.width, available_size.height);
 
@@ -133,23 +133,30 @@ export default {
                 (available_size.width - this.cols * this.size) / 2,
                 (available_size.height - this.rows * this.size) / 2,
             ]
-            this.grid = [];
 
             // Init array
+            const grid = [];
             for (let i = 0; i < this.cols; i++) {
-                this.grid[i] = [];
+                grid[i] = [];
                 for (let j = 0; j < this.rows; j++) {
-                    this.grid[i][j] = (random) ? Math.floor(this.sketch.random(2)) : 0;
+                    if (mode === "random") {
+                        grid[i][j] = Math.floor(this.sketch.random(2))
+                    } else if (mode === "resize" && (this.grid[i] || [])[j] !== undefined) {
+                        grid[i][j] = this.grid[i][j];
+                    } else {
+                        grid[i][j] = 0;
+                    }
                 }
             }
+            this.grid = grid;
         },
         init_grid_with_default_pattern() {
-            this.reset(false);
+            this.init_grid();
 
             if (this.cols < 2 || this.rows < 2) {
                 return;
             }
-            
+
             // Default pattern
             this.grid[1][0] = 1;
             this.grid[2][1] = 1;
@@ -158,7 +165,7 @@ export default {
             this.grid[2][2] = 1;
         },
         resize() {
-            this.reset(true);
+            this.init_grid("resize");
         },
     },
 };
