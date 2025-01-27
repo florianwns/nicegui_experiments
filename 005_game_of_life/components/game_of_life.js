@@ -48,8 +48,6 @@ export default {
             };
         },
         draw() {
-            // let x = this.sketch.frameCount % (40 / this.speed) * 10
-
             // FPS is 60, but we increase generation only if
             const must_generate_next_grid = this.playing
                 && this.sketch.frameCount % Math.floor(10 / this.speed) === 0;
@@ -59,6 +57,7 @@ export default {
 
             const alive_color = this.sketch.color(this.hex_color)
 
+            this.sketch.clear();
             for (let i = 0; i < this.cols; i++) {
                 for (let j = 0; j < this.rows; j++) {
                     if (this.grid[i][j] === 0) {
@@ -127,8 +126,9 @@ export default {
             this.generation_num = 0;
             emitEvent("gol__generation_num", this.generation_num);
 
-            this.cols = Math.floor(available_size.width / this.size);
-            this.rows = Math.floor(available_size.height / this.size);
+            // Add padding when computing number of cols and rows
+            this.cols = Math.floor(available_size.width / this.size) - 2;
+            this.rows = Math.floor(available_size.height / this.size) - 2;
             this.padding = [
                 (available_size.width - this.cols * this.size) / 2,
                 (available_size.height - this.rows * this.size) / 2,
