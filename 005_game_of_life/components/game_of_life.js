@@ -26,8 +26,8 @@ export default {
                 sketch.createCanvas(sketch.windowWidth, sketch.windowHeight);
             };
             sketch.draw = this.draw;
-            sketch.mouseDragged = this.update_drawing;
-            sketch.mouseClicked = this.update_drawing;
+            sketch.mouseDragged = this.modify_drawing;
+            sketch.mouseClicked = this.modify_drawing;
         }, this.$el);
 
         // Add event listeners
@@ -47,16 +47,22 @@ export default {
                 height: this.sketch.windowHeight - header_height - footer_height,
             };
         },
+        generate_next_grid_then_draw() {
+            this.generate_next_grid();
+            this.draw();
+        },
         draw() {
-            // FPS is 60, but we increase generation only if
-            const must_generate_next_grid = this.playing
-                && this.sketch.frameCount % Math.floor(10 / this.speed) === 0;
-            if (must_generate_next_grid) {
+            // FPS is normally 60, but we increase generation depends on speed factor
+            const increase_gen = this.sketch.frameCount % Math.floor(10 / this.speed) === 0;
+            if (!this.sketch.mouseIsPressed && !increase_gen) {
+                return;
+            }
+
+            if (this.playing && increase_gen) {
                 this.generate_next_grid();
             }
 
             const alive_color = this.sketch.color(this.hex_color)
-
             this.sketch.clear();
             for (let i = 0; i < this.cols; i++) {
                 for (let j = 0; j < this.rows; j++) {
@@ -73,9 +79,9 @@ export default {
                 }
             }
         },
-        update_drawing() {
-            const col = Math.floor(this.sketch.mouseX / this.size);
-            const row = Math.floor(this.sketch.mouseY / this.size);
+        modify_drawing() {
+            const col = Math.floor((this.sketch.mouseX - this.padding[0]) / this.size);
+            const row = Math.floor((this.sketch.mouseY - this.padding[1]) / this.size);
 
             // Check value exists then update
             if ((this.grid[col] || [])[row] !== undefined) {

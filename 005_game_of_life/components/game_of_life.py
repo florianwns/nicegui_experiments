@@ -53,7 +53,7 @@ class GameOfLife(
 
     def generate_next_grid(self, *args, **kwarg):
         self.playing = False
-        self.run_method("generate_next_grid")
+        self.run_method("generate_next_grid_then_draw")
 
     @property
     def drawing(self):
